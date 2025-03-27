@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import {Server as HttpServer} from 'http';
+import { socketLogger } from './middlewares/logger';
 
 
 export const initializeSocket = (server: HttpServer): Server => {
@@ -15,13 +16,13 @@ export const initializeSocket = (server: HttpServer): Server => {
         pingInterval: 30000,
     });
 
-    io.on('connection', (socket: Socket) => {
-        console.log('New client connected');
+    io.on('connection', async (socket: Socket) => {
+        socketLogger(`User connected: ${socket.id}`);
 
-        socket.on('disconnect', () => {
-            console.log('Client disconnected');
-        });
+        const rooms = await RoomRepository.findAll();
     });
+
+    return io;
     
     
     
